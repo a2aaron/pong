@@ -93,6 +93,35 @@ function ball(x_pos, y_pos) {
     }
 }
 
+function goal(width, height, is_left) {
+    this.width = width;
+    this.height = height;
+
+    if (is_left) {
+        this.x_pos = this.width/2
+    } else {
+        this.x_pos = canvas.width - this.width/2
+    }
+    this.y_pos = canvas.height/2
+
+    this.left_border = this.x_pos - this.width/2;
+    this.right_border = this.x_pos + this.width/2;
+    this.top_border = this.y_pos - this.height/2;
+    this.bottom_border = this.y_pos + this.height/2;
+
+    this.check_ball = function(ball) {
+        if (Math.abs(this.x_pos - ball.x_pos) < this.width &&
+            Math.abs(this.y_pos - ball.y_pos) < this.height) {
+            this.reset_ball(ball);
+        }
+    }
+
+    this.reset_ball = function(ball) {
+        ball.x_pos = canvas.width/2;
+        ball.y_pos = canvas.height/2;
+    }
+}
+
 // TODO: move to super class?
 function centered_rect(obj) {
     context.fillRect(obj.x_pos - obj.width/2, obj.y_pos - obj.height/2,
@@ -108,6 +137,8 @@ function cross_hairs(obj) {
 var left_paddle = new paddle(true, canvas.height/2, true);
 var right_paddle = new paddle(false, canvas.height/2, false);
 var ball = new ball(canvas.width/2, canvas.height/4);
+var left_goal = new goal(10, canvas.height, true);
+var right_goal = new goal(10, canvas.height, false);
 
 function draw() {
     // Draw the background.
@@ -137,6 +168,9 @@ function main() {
     left_paddle.update();
     right_paddle.update(ball);
     ball.update();
+    left_goal.check_ball(ball);
+    right_goal.check_ball(ball);
+
     draw();
     ticks += 1;
 }
