@@ -37,11 +37,24 @@ function paddle(is_left, y_pos, is_human) {
     this.paddle_bounce = function(ball) {
         // context.fillStyle = "red";
         // context.fillRect(this.x_pos, this.y_pos, this.width/2 + ball.width/2, this.height/2 + ball.height/2);
-        if (Math.abs(this.x_pos - ball.x_pos) < this.width/2 + ball.width/2 &&
-            Math.abs(this.y_pos - ball.y_pos) < this.height/2 + ball.height/2) {
+        var x_dist = Math.abs(this.x_pos - ball.x_pos);
+        var y_dist = Math.abs(this.y_pos - ball.y_pos);
+        // If ball is at left or right side of paddle and
+        // ball is between top and bottom parts of paddle,
+        // then do a horizontal bounce.
+        if (Math.abs(4 - x_dist) < this.width/2 + ball.width/2 &&
+            y_dist < this.height/2 + ball.height/2) {
             ball.horizontal_wall_bounce();
             ball.x_vel *= 1.1;
             ball.y_vel *= 1.1;
+        } 
+        // Also, if ball is at top or bottom side of battle and
+        // ball is between left and right sides of paddle, 
+        // then do a vertical bounce and horizontal bounce.
+        else if (Math.abs(4 - y_dist) < this.height/2 + ball.height/2 &&
+                 x_dist < this.width/2 + ball.width/2) {
+            ball.vertical_wall_bounce();
+            ball.horizontal_wall_bounce();
         }
     }
 
@@ -80,6 +93,8 @@ function ball(x_pos, y_pos) {
     this.update = function() {
         this.move(this.x_vel, this.y_vel);
         this.prevent_exit();
+        //this.width = Math.abs(Math.cos(ticks/1000) * 30);
+        //this.height = Math.abs(Math.cos(ticks/1000) * 30);
     }
 
     this.move = function(x, y) {
@@ -91,7 +106,9 @@ function ball(x_pos, y_pos) {
         if (this.y_pos < this.top_border + this.height/2) {
             this.vertical_wall_bounce();
             //this.y_pos = this.top_border + this.height/2;
-        } else if (this.y_pos > this.bottom_border - this.height/2) {
+        }
+
+        if (this.y_pos > this.bottom_border - this.height/2) {
             this.vertical_wall_bounce();
             //this.y_pos = this.bottom_border - this.height/2;
         }
@@ -99,7 +116,9 @@ function ball(x_pos, y_pos) {
         if (this.x_pos < this.left_border + this.width/2) {
             this.horizontal_wall_bounce();
             //this.x_pos = this.left_border + this.width/2;
-        } else if (this.x_pos > this.right_border - this.width/2) {
+        }
+
+         if (this.x_pos > this.right_border - this.width/2) {
             this.horizontal_wall_bounce();
             //this.x_pos = this.right_border - this.width/2;
         }
@@ -136,8 +155,8 @@ function goal(width, height, is_left) {
     this.bottom_border = this.y_pos + this.height/2;
 
     this.check_ball = function(ball) {
-        if (Math.abs(this.x_pos - ball.x_pos) < this.width &&
-            Math.abs(this.y_pos - ball.y_pos) < this.height) {
+        if (Math.abs(this.x_pos - ball.x_pos) < this.width + ball.width/2 &&
+            Math.abs(this.y_pos - ball.y_pos) < this.height + this.height/2) {
             this.reset_ball(ball);
         }
     }
@@ -170,12 +189,19 @@ var right_goal = new goal(10, canvas.height, false);
 
 function draw() {
     // Draw the background.
-    context.fillStyle = "black";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = "white";
+    // if (ticks % 100 == 0) {
+    //     draw_background();
+    // }
+    
+    
     left_paddle.draw();
     right_paddle.draw();
     ball.draw();
+}
+
+function draw_background() {
+    context.fillStyle = "black"; 
+    context.fillRect(0, 0, canvas.width, canvas.height);    
 }
 
 function getMousePosition(e) {
@@ -192,7 +218,9 @@ function getMousePosition(e) {
 
 var ticks = 0;
 function main() {
-
+    context.fillStyle = "black";
+    draw_background();
+    context.fillStyle = "white";
     left_paddle.update(ball);
     right_paddle.update(ball);
     ball.update();
@@ -207,4 +235,4 @@ document.addEventListener("mousemove", function(e) {
     mousePos = getMousePosition(e);
 }, false);
 
-setInterval(main, 20);
+setInterval(main, 10);
