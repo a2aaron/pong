@@ -54,7 +54,9 @@ function paddle(is_left, y_pos, is_human) {
 
 function ball(x_pos, y_pos) {
     this.x_pos = x_pos;
+    this.x_vel = Math.random()*10 - 5;
     this.y_pos = y_pos;
+    this.y_vel = Math.random()*10 - 5;
     this.width = 10;
     this.height = 10;
     this.top_border = 3
@@ -63,8 +65,7 @@ function ball(x_pos, y_pos) {
     this.right_border = canvas.width - 3;
 
     this.update = function() {
-        this.y_pos = canvas.height/2 + canvas.height * Math.sin(ticks/50);
-        this.x_pos = canvas.width/2 + canvas.height * Math.cos(ticks/50); 
+        this.move(this.x_vel, this.y_vel);
         this.prevent_exit();
     }
 
@@ -75,21 +76,33 @@ function ball(x_pos, y_pos) {
 
     this.prevent_exit = function() {
         if (this.y_pos < this.top_border + this.height/2) {
-            this.y_pos = this.top_border + this.height/2;
+            this.vertical_wall_bounce();
+            //this.y_pos = this.top_border + this.height/2;
         } else if (this.y_pos > this.bottom_border - this.height/2) {
-            this.y_pos = this.bottom_border - this.height/2;
+            this.vertical_wall_bounce();
+            //this.y_pos = this.bottom_border - this.height/2;
         }
 
         if (this.x_pos < this.left_border + this.width/2) {
-            this.x_pos = this.left_border + this.width/2;
+            this.horizontal_wall_bounce();
+            //this.x_pos = this.left_border + this.width/2;
         } else if (this.x_pos > this.right_border - this.width/2) {
-            this.x_pos = this.right_border - this.width/2;
+            this.horizontal_wall_bounce();
+            //this.x_pos = this.right_border - this.width/2;
         }
     }
 
     this.draw = function() {
         centered_rect(this);
         cross_hairs(this);
+    }
+
+    this.vertical_wall_bounce = function() {
+        this.y_vel = -this.y_vel;
+    }
+
+    this.horizontal_wall_bounce = function() {
+        this.x_vel = -this.x_vel;
     }
 }
 
@@ -117,8 +130,10 @@ function goal(width, height, is_left) {
     }
 
     this.reset_ball = function(ball) {
-        ball.x_pos = canvas.width/2;
-        ball.y_pos = canvas.height/2;
+        //ball.x_pos = canvas.width/2;
+        //ball.y_pos = canvas.height/2;
+        //ball.x_vel = Math.random()*10 - 5;
+        //ball.y_vel = Math.random()*10 - 5;
     }
 }
 
