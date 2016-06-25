@@ -24,12 +24,25 @@ function paddle(is_left, y_pos, is_human) {
 
     this.update = function(ball) {
         if (is_human) {
-            this.y_pos = mousePos.y; // Center paddle.
+            this.y_pos = mousePos.y;
         } else {
+            // Attempt to position midpoint of paddle at same level of ball.
             this.y_pos = this.y_pos + (ball.y_pos - this.y_pos)/10;
         }
-
         this.prevent_exit();
+        this.paddle_bounce(ball);
+        
+    }
+
+    this.paddle_bounce = function(ball) {
+        // context.fillStyle = "red";
+        // context.fillRect(this.x_pos, this.y_pos, this.width/2 + ball.width/2, this.height/2 + ball.height/2);
+        if (Math.abs(this.x_pos - ball.x_pos) < this.width/2 + ball.width/2 &&
+            Math.abs(this.y_pos - ball.y_pos) < this.height/2 + ball.height/2) {
+            ball.horizontal_wall_bounce();
+            ball.x_vel *= 1.1;
+            ball.y_vel *= 1.1;
+        }
     }
 
     this.prevent_exit = function() {
@@ -130,10 +143,10 @@ function goal(width, height, is_left) {
     }
 
     this.reset_ball = function(ball) {
-        //ball.x_pos = canvas.width/2;
-        //ball.y_pos = canvas.height/2;
-        //ball.x_vel = Math.random()*10 - 5;
-        //ball.y_vel = Math.random()*10 - 5;
+        ball.x_pos = canvas.width/2;
+        ball.y_pos = canvas.height/2;
+        ball.x_vel = Math.random()*10 - 5;
+        ball.y_vel = Math.random()*10 - 5;
     }
 }
 
@@ -149,9 +162,9 @@ function cross_hairs(obj) {
     context.fillRect(obj.x_pos, 0, 1, canvas.height);
 }
 
+var ball = new ball(canvas.width/2, canvas.height/4);
 var left_paddle = new paddle(true, canvas.height/2, true);
 var right_paddle = new paddle(false, canvas.height/2, false);
-var ball = new ball(canvas.width/2, canvas.height/4);
 var left_goal = new goal(10, canvas.height, true);
 var right_goal = new goal(10, canvas.height, false);
 
@@ -180,7 +193,7 @@ function getMousePosition(e) {
 var ticks = 0;
 function main() {
 
-    left_paddle.update();
+    left_paddle.update(ball);
     right_paddle.update(ball);
     ball.update();
     left_goal.check_ball(ball);
